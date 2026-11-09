@@ -10,6 +10,7 @@ class ModuleFP(PluginModuleBase):
         self.db_default = {
             f'{self.name}_db_version' : '4',
             f'{self.name}_use_plexscan' : 'False',
+            f'{self.name}_use_shyniscan' : 'False',
             f'{self.name}_ignore_rule' : '',
             f'{self.name}_change_rule' : '',
             f'fp_item_last_list_option' : '',
@@ -24,7 +25,9 @@ class ModuleFP(PluginModuleBase):
         try:
             db_item = ModelFPItem.process_discord_data(data)
 
-            if P.ModelSetting.get_bool(f'{self.name}_use_plexscan') == False:
+            use_plexscan = P.ModelSetting.get_bool(f'{self.name}_use_plexscan')
+            use_shyniscan = P.ModelSetting.get_bool(f'{self.name}_use_shyniscan')
+            if use_plexscan == False and use_shyniscan == False:
                 return
             ignore_list = P.ModelSetting.get_list(f'{self.name}_ignore_rule')
             for ignore in ignore_list:
@@ -43,12 +46,22 @@ class ModuleFP(PluginModuleBase):
 
             db_item.local_path = ret
 
-            PP = F.PluginManager.get_plugin_instance('plex_mate')
-            #PP.ModelScanItem(ret, mode="ADD", callback_id=f"gds_tool_{db_item.id}", callback_url=ToolUtil.make_apikey_url("/gds_tool/normal/fp/scan_completed")).save()
-            PP.ModelScanItem(ret, mode=db_item.scan_mode, callback_id=f"gds_tool_{db_item.id}", callback_url=ToolUtil.make_apikey_url("/gds_tool/normal/fp/scan_completed")).save()
+            callback_url = ToolUtil.make_apikey_url("/gds_tool/normal/fp/scan_completed")
+            sent = False
+            if use_plexscan:
+                PP = F.PluginManager.get_plugin_instance('plex_mate')
+                if PP is not None:
+                    PP.ModelScanItem(ret, mode=db_item.scan_mode, callback_id=f"gds_tool_{db_item.id}", callback_url=callback_url).save()
+                    sent = True
+            if use_shyniscan:
+                SP = F.PluginManager.get_plugin_instance('shyni_mate')
+                if SP is not None:
+                    SP.ModelScanItem(ret, mode=db_item.scan_mode, callback_id=f"gds_tool_{db_item.id}", callback_url=callback_url).save()
+                    sent = True
 
-            db_item.status = "SCAN_REQUEST"
-            db_item.save()
+            if sent:
+                db_item.status = "SCAN_REQUEST"
+                db_item.save()
         except Exception as e: 
             P.logger.error(f"Exception:{str(e)}")
             P.logger.error(traceback.format_exc())

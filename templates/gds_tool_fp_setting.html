@@ -15,6 +15,7 @@
 <div class="tab-content" id="nav-tabContent">
 {{ macros.m_tab_content_start('normal', true) }}
   {{ macros.setting_checkbox('fp_use_plexscan', 'Plex Scan 사용', value=arg['fp_use_plexscan'], desc=None) }}
+  {{ macros.setting_checkbox('fp_use_shyniscan', 'Shyni Scan 사용', value=arg['fp_use_shyniscan'], desc=None) }}
   <div id="fp_use_plexscan_div" class="collapse">
   {{ macros.setting_input_textarea_wide('fp_ignore_rule', '경로 무시 규칙', desc=['이 경로로 시작하는 변경사항은 무시. 구분자 엔터', '예: /ROOT/GDRIVE/VIDEO/국내TV/드라마', '라이브러리 경로가 없다면 어짜피 무시되지만 이곳에서 무시하면 Scanner 호출을 하지 않습니다.'], value=arg['fp_ignore_rule'], row='10') }}
   {{ macros.setting_input_textarea_wide('fp_change_rule', '경로 변경 규칙', desc=['소스|타겟 구분자 엔터', '예: /ROOT|/mnt/gds2'], value=arg['fp_change_rule'], row='10') }}
@@ -33,10 +34,21 @@
 
 $(document).ready(function(){
   use_collapse("fp_use_plexscan");
+  if ($('#fp_use_shyniscan').is(':checked')) {
+    $('#fp_use_plexscan_div').collapse('show');
+  }
 });
 
 $("body").on('change', '#fp_use_plexscan', function(e){
   use_collapse('fp_use_plexscan');
+});
+
+$("body").on('change', '#fp_use_shyniscan', function(e){
+  if ($('#fp_use_shyniscan').is(':checked') || $('#fp_use_plexscan').is(':checked')) {
+    $('#fp_use_plexscan_div').collapse('show');
+  } else {
+    $('#fp_use_plexscan_div').collapse('hide');
+  }
 });
 
 </script>    
