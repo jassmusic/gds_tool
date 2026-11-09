@@ -1,9 +1,7 @@
 ## Changelog
-- 1.2.5 (2026.11.10)    
-  halfaider 수정 반영 (스캔 완료 콜백 apikey 검증, rclone lsf를 lsjson으로 대체, 미사용 메소드 제거)
-
 - 1.2.4 (2026.11.10)    
   SHYNI MATE 대응 추가
+  halfaider 수정 반영 (스캔 완료 콜백 apikey 검증, rclone lsf를 lsjson으로 대체, 미사용 메소드 제거)
 
 - 1.2.3 (2025.07.30)    
   AV 변경사항 추가
